@@ -23,6 +23,9 @@ async function run() {
       .db("findMyDoctor")
       .collection("allDoctors");
     const usersCollection = client.db("findMyDoctor").collection("users");
+    const appointmentCollection = client
+      .db("findMyDoctor")
+      .collection("appointments");
 
     app.get("/doctors", async (req, res) => {
       try {
@@ -73,6 +76,30 @@ async function run() {
         res.send(result);
       } catch (error) {
         console.log("Internal Server Error", error);
+      }
+    });
+
+    app.post("/appointments", async (req, res) => {
+      try {
+        const data = req?.body;
+        const result = await appointmentCollection.insertOne(data);
+        res.send(result);
+      } catch (error) {
+        console.log("Internal Server Error", error);
+      }
+    });
+
+    app.get("/appointments/:email", async (req, res) => {
+      try {
+        const userEmail = req.params.email;
+        const query = { email: userEmail };
+
+        const result = await appointmentCollection.find(query).toArray();
+
+        res.json(result);
+      } catch (error) {
+        console.error("Internal Server Error", error);
+        res.status(500).send("Internal Server Error");
       }
     });
 
